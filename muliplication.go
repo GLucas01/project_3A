@@ -3,9 +3,10 @@ package main
 import (
 
     "fmt"
-
+	"time"
 )
 
+	
 func main() {
 
         var mat_row_1, mat_col_1 int
@@ -46,7 +47,7 @@ func main() {
 		}
 		
 	
-		var result[10][10] int
+		var result[100][100] int
 
         fmt.Println("\nEnter first matrix: \n")
 
@@ -64,7 +65,8 @@ func main() {
 			}
 		}
 
-
+		start := time.Now().UnixNano() 
+		//start := time.Now().UnixNano() / int64(time.Millisecond)
         // Multiplication of two matrix
 
         for i:=0; i < mat_row_1; i++{
@@ -75,13 +77,18 @@ func main() {
 
                 for k:=0; k < mat_col_1; k++{
 
-                    result[i][j] += mat_1[i][k] * mat_2[k][j]
+                   result[i][j] += mat_1[i][k] * mat_2[k][j]
+                    
 
                 }
 
             }
         }
 
+		end := time.Now().UnixNano() 
+		//end := time.Now().UnixNano() / int64(time.Millisecond)
+		diff := (end - start)
+        fmt.Println("Duration(ns):", start,end,diff)
         fmt.Println("\nMatrix Multiplication: \n")
 
         for i:=0; i < mat_row_1; i++{
