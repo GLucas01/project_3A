@@ -130,7 +130,8 @@ func main() {
 		}else{
 			
 			for i := 0; i < mat_row_1; i = i+row_per_worker {
-				 go mul_mat(mat_1, mat_2, &result,i,i+row_per_worker, mat_col_1, mat_col_2)
+				wd.Add(1)
+				go mul_mat(mat_1, mat_2, &result,i,i+row_per_worker, mat_col_1, mat_col_2)
 				fmt.Println("--------\n")
 				
 			}
