@@ -13,21 +13,15 @@ import Random
 import Json.Decode exposing (..)
 
 
-
-
-
-
-
-
 -- MODEL
 
-type State = Failure String | Loading | Success String
+type State = Failure String | Loading | Success String             --création du type State qui peut prendre 3 valeurs
 
-type alias Datas = { word : String, meanings : List Meaning}
+type alias Datas = { word : String, meanings : List Meaning}              --création d'alias de type : Datas, Meaning et Definition
 type alias Meaning = {partOfSpeech : String, definitions : List Definition}    
 type alias Definition = {definition : String}
 
-type alias Model = 
+type alias Model =             -- création du modèle utilisé par l'application
     { http : State
     , content : String 
     , lWords : List String
@@ -37,10 +31,10 @@ type alias Model =
     }
 
 init : () -> (Model, Cmd Msg)             
-init _ =
+init _ =                                              -- initialisation du modèle 
   ( Model Loading "" [] "" Loading []
   , Http.get
-      { url = " http://localhost:8000/monFichier.txt"
+      { url = " http://localhost:8000/monFichier.txt"                   -- récupération du fichier txt contenant les mots 
       , expect = Http.expectString Words
       }
   )
@@ -48,70 +42,70 @@ init _ =
 -- UPDATE
 
 
-type Msg
+type Msg                                      -- définition du type Msg pour les msg envoyés à l'application
   = Words (Result Http.Error String)
-  | RandomWord Int
+  | RandomWord Int                                -- Msg peut prendre différentes valeurs : Words,RandomWord,GotJson et Change 
   | GotJson (Result Http.Error (List Datas))
   | Change String
 
   
-update : Msg -> Model -> (Model, Cmd Msg)
+update : Msg -> Model -> (Model, Cmd Msg)               -- update prends un msg et un model en argument
 update msg model =
-  case msg of
+  case msg of                             -- avec case on traite en fonction du message recu 
     Words result ->
       case result of
         Ok words ->
-          ({ model | lWords = String.words words , http = Success "" } , randomWord model)
+          ({ model | lWords = String.words words , http = Success "" } , randomWord model)      --  si la réponse http est un succès on met à jour http 
 
         Err error ->
-          ({model | http = Failure (toString error)}, Cmd.none)
+          ({model | http = Failure (toString error)}, Cmd.none)         -- si il y a une erreur alors on met à jour l'état de http à échec
           
-    RandomWord index -> case (getElemList model.lWords index) of
-                                Nothing -> (model, randomWord model)
-                                Just x -> ({ model | word = x }, Http.get {url = ("https://api.dictionaryapi.dev/api/v2/entries/en/" ++ x)  , expect = Http.expectJson GotJson lDatasDecoder})
-     
+    RandomWord index -> case (getElemList model.lWords index) of                  -- récupère un mot dans la liste à l'index spécifié par le msg
+                                Nothing -> (model, randomWord model)            -- si le mot n'existe pas on refait appel à randomword
+                                Just x -> ({ model | word = x }, Http.get {url = ("https://api.dictionaryapi.dev/api/v2/entries/en/" ++ x)  , expect = Http.expectJson GotJson listDatasDecoder})
+                                                      -- si le mot existe on met à jour la valeur Word du modèle puis envois une requete pour récuperer les définitions 
     GotJson result -> case result of
-                            Ok data-> ({ model | jSon = Success "" , datas = data} , Cmd.none)
+                            Ok data-> ({ model | jSon = Success "" , datas = data} , Cmd.none)  -- si il y a succès alors on met à jour datas dans le modèle et met à jour l'état de jSon.
 
-                            Err error -> ({ model | jSon = Failure (toString error) } , randomWord model)   
+                            Err error -> ({ model | jSon = Failure (toString error) } , randomWord model)   -- si il y a une erreur on met à jour l'état de jSon et on rappel randomWorld pour avoir un autre mot.
 
-    Change newContent -> ({model | content = newContent}, Cmd.none)
+    Change newContent -> ({model | content = newContent}, Cmd.none)   -- on met à jour la valeur de content du modèle.
     
 randomWord : Model -> Cmd Msg
-randomWord model = Random.generate RandomWord (Random.int 1 (1000)) -- erreur potentielle ici 
+randomWord model = Random.generate RandomWord (Random.int 1 (1000))        -- on utilise randomWorld pour générer un msg RandomWorld avec l'index entre 1 et 1000.
 
 
 -- VIEW
-viewWord : Model -> Html Msg
+viewWord : Model -> Html Msg   -- prend un model en entrée
 viewWord model =
-  case model.http of
-    Loading -> text "Chargement de la page"
+  case model.http of                -- on vérifie l'état de http 
+    Loading -> text "Chargement de la page"          -- en fonction de l'état on affiche des messages différents.
     
     Failure error -> text ("Chargement impossible : " ++ error) 
 
-    Success good -> overlay model (
+    Success good -> overlay model (                  -- en cas de succès on fait appel à la fonction overlay définie plus bas
       case model.jSon of
-        Success veryGood -> [div [] (List.map viewData model.datas)]
-        Loading -> [text "Chargement"]
-        Failure error -> [text ("échec " ++ error)] )
+        Success veryGood -> [div [] (List.map viewData model.datas)]    -- on affiche les données dans une balise div
+        Loading -> [text "Chargement"]                  -- on affiche chargement
+        Failure error -> [text ("échec " ++ error)] )    -- on affiche échec et l'erreur.
 
-viewData : Datas -> Html Msg
+viewData : Datas -> Html Msg      -- prend Datas en entrée
 viewData data =
     div []
-        [ 
+        [                                    -- on créer une balise vide où on ajoute la liste ul qui est remplie avec list map et viewmeaning à partir des Datas d'entrée.
          ul [] (List.map viewMeaning data.meanings)
         ]
 
-viewMeaning : Meaning -> Html Msg
+viewMeaning : Meaning -> Html Msg   -- prend  un objet meaning en entrée
 viewMeaning meaning =
-    div []
+    div []                            -- créer une balise vide  et y ajoute un en-tête qui contient partOfSpeech de meaning
         [ h4 [] [text meaning.partOfSpeech]
-        , ul [] (List.map viewDefinition meaning.definitions)
+        , ul [] (List.map viewDefinition meaning.definitions)    -- ajout de la liste ul qui est remplie avec list map et viewdefinition 
         ]
 
-viewDefinition : Definition -> Html Msg
-viewDefinition definition =
-    li [] [text definition.definition]
+viewDefinition : Definition -> Html Msg    -- prend un objet definitin en entrée 
+viewDefinition definition =             
+    li [] [text definition.definition]        -- créer une balise vide li et y ajoute le texte de la définition.
 
 
 
@@ -128,10 +122,10 @@ subscriptions model =
 
 
           
--- JSON 
+-- JSON                     définition des fonctions listDatasDecoder, definitionDecoder, datasDecoder et meaningDecoder
 
-lDatasDecoder : Decoder (List Datas)
-lDatasDecoder = Json.Decode.list datasDecoder
+listDatasDecoder : Decoder (List Datas)
+listDatasDecoder = Json.Decode.list datasDecoder
 definitionDecoder : Decoder Definition
 definitionDecoder = Json.Decode.map Definition (field "definition" string)
 datasDecoder : Decoder Datas
@@ -140,27 +134,27 @@ meaningDecoder : Decoder Meaning
 meaningDecoder = map2 Meaning (field "partOfSpeech" string)(field "definitions" <| Json.Decode.list definitionDecoder)
 
 
--- HELPERS
-getElemList : List a -> Int -> Maybe a
+-- HELPERS                                            définition des fonctions getElemList, toString,textDatas,textDef,textMeaning et overlay
+getElemList : List a -> Int -> Maybe a  -- renvoi l'élément de la liste correspondant à l'index demandé.
 getElemList list index =
     if index < 0 || index >= List.length list then
         Nothing
     else
         List.head (List.drop index list)
 
-toString : Http.Error -> String 
+toString : Http.Error -> String     -- en fonction des erreurs renvois une chaîne de caractère différente
 toString erreur = 
   case erreur of 
-    Http.BadUrl err -> "BadUrl" ++ err
+    Http.BadUrl err -> "Mauvaise URL " ++ err
     Http.Timeout -> "Timeout"
-    Http.NetworkError -> "NetworkError"
-    Http.BadStatus err -> "BadStatus" ++ String.fromInt err
+    Http.NetworkError -> "Erreur réseau"
+    Http.BadStatus err -> "Mauvais statut" ++ String.fromInt err
     Http.BadBody err -> "BadBody" ++ err 
 
 
 
         
-textDatas : (List Datas) -> List (Html Msg)
+textDatas : (List Datas) -> List (Html Msg)     -- parcours la liste de données et renvoie une liste avec les meanings de chaque data
 textDatas datas = 
   case datas of 
     [] -> []
@@ -168,32 +162,32 @@ textDatas datas =
     
 
     
-textDef : List Definition -> List (Html Msg)
+textDef : List Definition -> List (Html Msg)          -- parcours la liste de définitions et renvoie une liste avec l'analyse des définitions.
 textDef def = 
   case def of
     [] -> []
     (x :: xs) -> [li [] [text x.definition]] ++ (textDef xs)  
 
-textMeaning : List Meaning -> List (Html Msg)
+textMeaning : List Meaning -> List (Html Msg)           -- parcours la liste des meanings et renvoie une liste avec partOfSpeech et la definition associée
 textMeaning meanings = 
   case meanings of
     [] -> []
     (x :: xs) -> [li [] [text x.partOfSpeech]] ++ [ol [] (textDef x.definitions)] ++ (textMeaning xs) 
     
 overlay : Model -> List (Html Msg) -> Html Msg
-overlay model txt = 
+overlay model txt =                                            -- gérer l'affichage sur la page web
   div [] 
       [
        div [style "text-align" "left"]
          txt
-       , div [style "text-align" "center"]
+       , div [style "text-align" "left"]
          [ div []
             [input [placeholder "écris ta réponse", Html.Attributes.value model.content, onInput Change] [] 
             ,
             if String.toLower model.content == String.toLower model.word then
                div[style "color" "Blue" ] [text "Bravo"]
             else
-               div [] [text ("Tu as entré  " ++ model.content) ]
+               div [ style "color" "Blue"][text ("Tu as entré  " ++ model.content) ]
             ]
          ]
       ]
@@ -205,3 +199,5 @@ overlay model txt =
 
 main =
   Browser.element{ init = init, update = update, subscriptions = subscriptions, view = viewWord}
+
+
