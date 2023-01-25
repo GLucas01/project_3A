@@ -78,7 +78,7 @@ update msg model =
     Change newContent -> ({model | content = newContent}, Cmd.none)
     
 randomWord : Model -> Cmd Msg
-randomWord model = Random.generate RandomWord (Random.int 1 (List.length model.lWords)) -- erreur potentielle ici 
+randomWord model = Random.generate RandomWord (Random.int 1 (1000)) -- erreur potentielle ici 
 
 
 -- VIEW
@@ -98,8 +98,8 @@ viewWord model =
 viewData : Datas -> Html Msg
 viewData data =
     div []
-        [ h3 [] [text data.word]
-        , ul [] (List.map viewMeaning data.meanings)
+        [ 
+         ul [] (List.map viewMeaning data.meanings)
         ]
 
 viewMeaning : Meaning -> Html Msg
