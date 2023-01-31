@@ -1,22 +1,34 @@
-let boucle = false;
+let stop_boucle = false;
+
+console.log("Welcome to ZK & Lucas Shell")
+console.log("Type <<--help>> to discover the program")
 
 
-while (!boucle) {
-	//const prompt = require('prompt-sync')({sigint: true});
-	//sigint = signal interupt
-	const prompt = require('prompt-sync')();
+while (!stop_boucle) {
+
+    const prompt = require('prompt-sync')();
     const execSync = require('child_process').execSync;
-    
     let command = prompt('+ :');
       
-    if (command=="shutdown"){
-        boucle = true
-        }
-    if (command=="lp"){
+    if (command=="--help"){
+        console.log("\n-------------------------------------")
+        console.log("Type <<lp>> to show active processor")
+        console.log("Type <<bing man>> to show bing manual")
+        console.log("Type <<shutdown>> to quit the program")
+        console.log("-------------------------------------\n")
+
+    }
+
+    else if (command=="shutdown"){
+        stop_boucle = true
+     }
+
+    else if (command=="lp"){
         const output = execSync('ps -a', { encoding: 'utf-8' });
         console.log(output);
     }
-    if (command.match('bing ([^\']+)')){
+
+    else if (command.match('bing ([^\']+)')){
         action=command.match('bing ([^\']+)');
         if (action[1].match('-k ([^\']+)')){
             console.log("Kill %d",action[1].match('-k ([^\']+)')[1])
@@ -35,8 +47,12 @@ while (!boucle) {
             console.log("-k for kill | -p for pause | -c for continue")
         }
         else {
-            console.log("Invalid command. Try <<man bing>> for user manual")
+            console.log("Invalid command. Try <<man bing>> for bing manual")
         }
+    }
+
+    else {
+        console.log("Invalid command. Try <<--help>> for user manual")
     }
 
     
