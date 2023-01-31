@@ -1,4 +1,3 @@
-//do if col1 and row2 not same cannot 
 package main
 
 import (
@@ -39,6 +38,7 @@ func multiplicationMatrices(mat1 [][]int, mat2 [][]int) [][]int { // prends 2 ma
 	
 	results := make(chan Result) //creer un channel
 	
+	start := time.Now().UnixNano() 
 	worker_number:=5 //nombre de worker
 	row_per_worker :=(mat_row_1)/worker_number //nombre de la ligne par un worker
 	mod := (mat_row_1)%worker_number //modulo de la ligne
@@ -59,6 +59,9 @@ func multiplicationMatrices(mat1 [][]int, mat2 [][]int) [][]int { // prends 2 ma
 			go mul_mat(mat1, mat2,i,i+row_per_worker, mat_col_1, mat_col_2,results)	
 		}
 	}
+	end := time.Now().UnixNano() 
+	diff := (end - start)
+	fmt.Println("Duration(ns):", start,end,diff)
 	
 	ans := make([][]int, len(mat1)) // créer une matrice résultat de la taille de mat1 avec des zéros partout
 	for i := range ans {            // pour chaque ligne de la matrice on crée une nouvelle colonne de la taille de la première colonne de mat2.
@@ -81,7 +84,7 @@ func multiplicationMatrices(mat1 [][]int, mat2 [][]int) [][]int { // prends 2 ma
 }
 
 func Connection(conn net.Conn) { // utilisation de gob pour décoder les matrices recues par le client tcp.
-	start := time.Now().UnixNano() 
+	//start := time.Now().UnixNano() 
 	decoder := gob.NewDecoder(conn)
 	var mat1, mat2 [][]int
 	err := decoder.Decode(&mat1) // decode la première matrice
@@ -102,9 +105,9 @@ func Connection(conn net.Conn) { // utilisation de gob pour décoder les matrice
 		return
 	}
 	conn.Close() //ferme la connexion
-	end := time.Now().UnixNano() 
-	diff := (end - start)
-	fmt.Println("Duration(ns):", start,end,diff)
+	//end := time.Now().UnixNano() 
+	//diff := (end - start)
+	//fmt.Println("Duration(ns):", start,end,diff)
 }
 
 func main() { // main pour écouter le client sur le port 8080
