@@ -34,6 +34,7 @@ func multiplicationMatrices(mat1 [][]int, mat2 [][]int) [][]int { // prends 2 ma
 }
 
 func Connection(conn net.Conn) { // utilisation de gob pour décoder les matrices recues par le client tcp.
+	start := time.Now().UnixNano()
 	decoder := gob.NewDecoder(conn)
 	var mat1, mat2 [][]int
 	err := decoder.Decode(&mat1) // decode la première matrice
@@ -54,6 +55,9 @@ func Connection(conn net.Conn) { // utilisation de gob pour décoder les matrice
 		return
 	}
 	conn.Close() //ferme la connexion
+	end := time.Now().UnixNano()
+	diff := (end - start)
+	fmt.Println("Duration(ns):", start, end, diff)
 }
 
 func main() { // main pour écouter le client sur le port 8080
