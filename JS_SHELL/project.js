@@ -15,6 +15,8 @@ while (!stop_boucle) {
         console.log("Type <<lp>> to show active processor")
         console.log("Type <<bing man>> to show bing manual")
         console.log("Type <<shutdown>> to quit the program")
+        console.log("Type <<clear>> to clear the terminal")
+        console.log("Type <<exec [program_name]>> to run a program in the operating system")
         console.log("-------------------------------------\n")
 
     }
@@ -27,7 +29,15 @@ while (!stop_boucle) {
         const output = execSync('ps -a', { encoding: 'utf-8' });
         console.log(output);
     }
+    else if (/^exec /.test(command)) {
+        let prog = command.replace(/^exec /, "");
 
+        execSync(prog, { encoding: 'utf-8' });
+    }
+
+    else if(command == "clear"){
+        console.clear();
+    }
     else if (command.match('bing ([^\']+)')){
         action=command.match('bing ([^\']+)');
         if (action[1].match('-k ([^\']+)')){
@@ -57,6 +67,3 @@ while (!stop_boucle) {
 
     
 }
-
-
-
