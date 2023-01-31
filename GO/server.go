@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"sync"
+	"time"
 )
 
 func multiplication(mat1 [][]int, mat2 [][]int, resultat [][]int, i int, j int, wg *sync.WaitGroup) { // prends en arg 3 matrices d'entiers, deux entiers i et j qui sont les index de ligne et colonne et un pointeur
@@ -18,10 +19,11 @@ func multiplication(mat1 [][]int, mat2 [][]int, resultat [][]int, i int, j int, 
 
 func multiplicationMatrices(mat1 [][]int, mat2 [][]int) [][]int { // prends 2 matrices et renvoies le résultat
 	resultat := make([][]int, len(mat1)) // créer une matrice résultat de la taille de mat1 avec des zéros partout
+	
 	for i := range resultat {            // pour chaque ligne de la matrice on crée une nouvelle colonne de la taille de la première colonne de mat2.
 		resultat[i] = make([]int, len(mat2[0]))
 	}
-
+	start := time.Now().UnixNano() 
 	var wg sync.WaitGroup            // wg pour synchroniser les goroutines.
 	for i := 0; i < len(mat1); i++ { // len(mat1) correspond au nbr de lignes de la matrice   1
 		for j := 0; j < len(mat2[0]); j++ { // len(mat2[0]) correspond au nbr de colonnes de la matrice 2
@@ -30,11 +32,14 @@ func multiplicationMatrices(mat1 [][]int, mat2 [][]int) [][]int { // prends 2 ma
 		} // on peut faire de la concurrence sur chaque ligne en mettant la goroutine après le for i.
 	}
 	wg.Wait() // attente de synchronisation des goroutines.
+	end := time.Now().UnixNano() 
+	diff := (end - start)
+	fmt.Println("Duration(ns):", start,end,diff)
 	return resultat
 }
 
 func Connection(conn net.Conn) { // utilisation de gob pour décoder les matrices recues par le client tcp.
-	start := time.Now().UnixNano()
+	//start := time.Now().UnixNano() 
 	decoder := gob.NewDecoder(conn)
 	var mat1, mat2 [][]int
 	err := decoder.Decode(&mat1) // decode la première matrice
@@ -55,13 +60,11 @@ func Connection(conn net.Conn) { // utilisation de gob pour décoder les matrice
 		return
 	}
 	conn.Close() //ferme la connexion
-	end := time.Now().UnixNano()
-	diff := (end - start)
-	fmt.Println("Duration(ns):", start, end, diff)
+	
 }
 
 func main() { // main pour écouter le client sur le port 8080
-	ln, err := net.Listen("tcp", ":8080")
+	ln, err := net.Listen("tcp", ":8081")
 	if err != nil {
 		fmt.Println(err)
 		return
