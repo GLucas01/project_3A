@@ -14,8 +14,8 @@ type Result struct {
 	res int
 }
 
-
-func mul_mat(mat_1, mat_2 [][]int, mat_row_1_start, mat_row_1_end, mat_col_1, mat_col_2 int, results chan Result) {
+//function pour faire la calculation de la matrice 
+func mul_mat(mat_1, mat_2 [][]int, mat_row_1_start, mat_row_1_end, mat_col_1, mat_col_2 int, results chan Result) {   // prends en arg 2 matrices d'entiers, la commence de la ligne matrice 1(5 par 5), la fin de la ligne matrice 1(5 par 5), le nombre de colonne matrice 1, le nombre de colonne matrice 2 et un channel resultat 
     for i := mat_row_1_start; i < mat_row_1_end; i++ {
         for j := 0; j < mat_col_2; j++ {
              func(i, j int) {
@@ -24,8 +24,8 @@ func mul_mat(mat_1, mat_2 [][]int, mat_row_1_start, mat_row_1_end, mat_col_1, ma
                     total += mat_1[i][k] * mat_2[k][j]
                 }
                 
-                response := Result{i: i, j: j, res: total}
-				results <- response
+                response := Result{i: i, j: j, res: total} //response stocké le resultat dans une structure Result
+				results <- response //stocke la reponse dans le channel
             }(i, j)
         }
     }
@@ -37,11 +37,11 @@ func multiplicationMatrices(mat1 [][]int, mat2 [][]int) [][]int { // prends 2 ma
 	mat_col_1 :=len(mat1[0])
 	mat_col_2 :=len(mat2[0])
 	
-	results := make(chan Result)
+	results := make(chan Result) //creer un channel
 	
-	worker_number:=5
-	row_per_worker :=(mat_row_1)/worker_number
-	mod := (mat_row_1)%worker_number
+	worker_number:=5 //nombre de worker
+	row_per_worker :=(mat_row_1)/worker_number //nombre de la ligne par un worker
+	mod := (mat_row_1)%worker_number //modulo de la ligne
 	
 	if mod != 0{
 			
@@ -52,6 +52,7 @@ func multiplicationMatrices(mat1 [][]int, mat2 [][]int) [][]int { // prends 2 ma
 		new :=mat_row_1-mod
 		end :=mat_row_1
 		go mul_mat(mat1, mat2,new,end, mat_col_1, mat_col_2,results)
+	
 	}else{
 			
 		for i := 0; i < mat_row_1; i = i+row_per_worker {
@@ -64,13 +65,13 @@ func multiplicationMatrices(mat1 [][]int, mat2 [][]int) [][]int { // prends 2 ma
 		ans[i] = make([]int, len(mat2[0]))
 	}
 	for a := 1; a <= mat_row_1*mat_col_2; a++ {
-			x:= <-results
+			x:= <-results //retirer le resultat depuis le channel
 
 		for i:=0; i < mat_row_1; i++{
 			for j:=0; j < mat_col_2; j++{	
 					
 					if (x.i==i && x.j==j) {
-						ans[i][j] = x.res
+						ans[i][j] = x.res //mettre le resultat dans la matrice resultat en suivrant l'ordre
 					}
 
 			}
