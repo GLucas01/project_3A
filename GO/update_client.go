@@ -41,7 +41,7 @@ func main() {
 		fmt.Println("Erreur : Column de la matrice 1 n'egale pas ligne de la matrice 2")
 		os.Exit(3)
 	}
-	fmt.Println("HELLO")
+	
 	// envoies les matrices au serveur
 	enc := gob.NewEncoder(conn)
 	err = enc.Encode(mat1)
