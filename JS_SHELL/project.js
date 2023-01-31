@@ -29,10 +29,11 @@ while (!stop_boucle) {
         const output = execSync('ps -a', { encoding: 'utf-8' });
         console.log(output);
     }
-    else if (/^exec /.test(command)) {
-        let prog = command.replace(/^exec /, "");
+    else if (command.match('exec ([^\']+)')){
+        program=command.match('exec ([^\']+)');
+        console.log("Executing the program : "+program[1])
+        execSync('open '+program[1], { encoding: 'utf-8' });
 
-        execSync(prog, { encoding: 'utf-8' });
     }
 
     else if(command == "clear"){
