@@ -12,7 +12,7 @@ go run server.go
 ```
 python3 generate.py
 ```
-Make sure you set the matrix size desired and change the file name <br />
+   **Make sure you set the desired matrix size and change the file name <br />
 
 5. Open a new terminal and start the client program
 ```
