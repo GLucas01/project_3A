@@ -4,7 +4,7 @@ At the end of this project, we found out that the calculation time will not have
 --START THE PROGRAM--
 1. Download all the source code in a directory
 2. Be sure to install ``go`` in your machine
-3. Start the server program in terminal to start listen for the connection
+3. Start the server program in terminal to start listen for the connection. You may set a different number of worker to be used in line 43 in the ```server.go``` code
 ```
 go run server.go
 ```
@@ -12,11 +12,12 @@ go run server.go
 ```
 python3 generate.py
 ```
-Make sure you set the matrix size desired and change the file name
+Make sure you set the matrix size desired and change the file name <br />
+
 5. Open a new terminal and start the client program
 ```
 go run client.go
 ```
-You can insert the ```txt``` file for the matrix you want to calculate
+You can insert the ```txt``` file for the matrix you want to calculate <br />
 6. In the server program, it will display the time taken (in nano seconds) for the matrix calculation
 
