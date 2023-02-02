@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net"
 	"time"
-	"runtime"
+	//"runtime"
 )
 
 type Result struct {
@@ -82,7 +82,7 @@ func multiplicationMatrices(mat1 [][]int, mat2 [][]int) [][]int { // prends 2 ma
 	}
 	end := time.Now().UnixNano() 
 	diff := (end - start)
-	fmt.Println("Duration(ns):", start,end,diff)
+	fmt.Println("Duration(ns):", diff)
 	return ans
 }
 
@@ -114,7 +114,7 @@ func Connection(conn net.Conn) { // utilisation de gob pour décoder les matrice
 }
 
 func main() { // main pour écouter le client sur le port 8080
-	fmt.Printf("NumCPU; %v\n", runtime.NumCPU())
+	//fmt.Printf("NumCPU; %v\n", runtime.NumCPU())
 	ln, err := net.Listen("tcp", ":8081")
 	if err != nil {
 		fmt.Println(err)
