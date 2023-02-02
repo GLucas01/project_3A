@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"time"
+	"runtime"
 )
 
 type Result struct {
@@ -39,7 +40,7 @@ func multiplicationMatrices(mat1 [][]int, mat2 [][]int) [][]int { // prends 2 ma
 	results := make(chan Result) //creer un channel
 	
 	start := time.Now().UnixNano() 
-	worker_number:=5 //nombre de worker
+	worker_number:=8 //nombre de worker
 	row_per_worker :=(mat_row_1)/worker_number //nombre de la ligne par un worker
 	mod := (mat_row_1)%worker_number //modulo de la ligne
 	
@@ -59,9 +60,7 @@ func multiplicationMatrices(mat1 [][]int, mat2 [][]int) [][]int { // prends 2 ma
 			go mul_mat(mat1, mat2,i,i+row_per_worker, mat_col_1, mat_col_2,results)	
 		}
 	}
-	end := time.Now().UnixNano() 
-	diff := (end - start)
-	fmt.Println("Duration(ns):", start,end,diff)
+	
 	
 	ans := make([][]int, len(mat1)) // créer une matrice résultat de la taille de mat1 avec des zéros partout
 	for i := range ans {            // pour chaque ligne de la matrice on crée une nouvelle colonne de la taille de la première colonne de mat2.
@@ -70,7 +69,8 @@ func multiplicationMatrices(mat1 [][]int, mat2 [][]int) [][]int { // prends 2 ma
 	for a := 1; a <= mat_row_1*mat_col_2; a++ {
 			x:= <-results //retirer le resultat depuis le channel
 
-		for i:=0; i < mat_row_1; i++{
+		ans[x.i][x.j] = x.res
+/*		for i:=0; i < mat_row_1; i++{
 			for j:=0; j < mat_col_2; j++{	
 					
 					if (x.i==i && x.j==j) {
@@ -78,8 +78,11 @@ func multiplicationMatrices(mat1 [][]int, mat2 [][]int) [][]int { // prends 2 ma
 					}
 
 			}
-		}	
+		}*/	
 	}
+	end := time.Now().UnixNano() 
+	diff := (end - start)
+	fmt.Println("Duration(ns):", start,end,diff)
 	return ans
 }
 
@@ -111,6 +114,7 @@ func Connection(conn net.Conn) { // utilisation de gob pour décoder les matrice
 }
 
 func main() { // main pour écouter le client sur le port 8080
+	fmt.Printf("NumCPU; %v\n", runtime.NumCPU())
 	ln, err := net.Listen("tcp", ":8081")
 	if err != nil {
 		fmt.Println(err)
