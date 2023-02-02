@@ -3,4 +3,4 @@ At the end of this project, we found out that the calculation time will not have
 
 --START THE PROGRAM--
 1. Download all the source code in a directory
-2. Be sure to install '''go''' in your machine
+2. Be sure to install ``go`` in your machine
