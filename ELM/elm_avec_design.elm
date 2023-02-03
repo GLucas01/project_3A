@@ -200,7 +200,16 @@ overlay model txt =                                            -- gérer l'affic
             else
                div [style "color" "Blue"][h4[][text ("Tu as entré  " ++ model.content) ]]
 
-                ,button [ style "background-color" "#237689", style "color" "white", style "padding" "15 px 32px", style "text-align" "center" , style "margin" "4px 2px",style "border" "none", style "display" "inline-block" ,onClick Next ] [ text "Next Question" ]
+                ,div[][button [ style "background-color" "#237689", 
+                          style "color" "white", 
+                          style "padding" "15 px 32px", 
+                          style "text-align" "center" , 
+                          style "margin" "4px 2px",
+                          style "border" "none", 
+                          style "display" "inline-block" ,
+                          style "font-size" "16px", 
+                          style "cursor" "pointer",
+                          onClick Next ] [ text "Next Question" ]]
             ]
          ]
       ]
